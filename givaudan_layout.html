@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Givaudan MX · Master Layout · PE-S10000</title>
+
+  <!-- =========================================================
+       VARIABLES CSS — "Industrial Dark Mode"
+       Toda la paleta se define aquí para fácil mantenimiento.
+       ========================================================= -->
+  <style>
+    :root {
+      /* Colores base */
+      --clr-bg-app:        #0d0f14;   /* Fondo principal de la app */
+      --clr-bg-sidebar:    #131720;   /* Sidebar */
+      --clr-bg-panel:      #1a1f2e;   /* Tarjetas internas */
+      --clr-bg-panel-alt:  #0f1118;   /* Fondo alternativo del SVG */
+      --clr-border:        #2a3045;   /* Bordes generales */
+      --clr-border-accent: #3a4a7a;   /* Borde activo/hover */
+
+      /* Tipografía */
+      --clr-text-primary:  #e8ecf4;
+      --clr-text-secondary:#8a95b0;
+      --clr-text-muted:    #4a5570;
+
+      /* Acento Givaudan — azul corporativo */
+      --clr-accent:        #006eff;
+      --clr-accent-glow:   rgba(0, 110, 255, 0.18);
+      --clr-accent-hover:  rgba(0, 110, 255, 0.22);
+
+      /* Estados */
+      --clr-success:       #00c875;
+      --clr-warning:       #ffa94d;
+      --clr-danger:        #ff5c5c;
+
+      /* Espaciados */
+      --sp-xs:  4px;
+      --sp-sm:  8px;
+      --sp-md:  16px;
+      --sp-lg:  24px;
+      --sp-xl:  32px;
+
+      /* Radios */
+      --r-sm:   4px;
+      --r-md:   8px;
+      --r-lg:   12px;
+
+      /* Sidebar fija */
+      --sidebar-w: 300px;
+
+      /* Duración de animaciones */
+      --anim-fast: 180ms;
+      --anim-slow: 420ms;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--clr-bg-app);
+      color: var(--clr-text-primary);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ============================================================
+       TOPBAR — Identificación del proyecto
+       ============================================================ */
+    #topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--sp-lg);
+      height: 52px;
+      background: var(--clr-bg-sidebar);
+      border-bottom: 1px solid var(--clr-border);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-md);
+    }
+
+    /* Isotipo Givaudan — "G" estilizada */
+    .topbar-logo {
+      width: 32px; height: 32px;
+      background: var(--clr-accent);
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 18px; color: #fff;
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+
+    .topbar-title {
+      display: flex; flex-direction: column; line-height: 1.2;
+    }
+
+    .topbar-title span:first-child {
+      font-size: 13px; font-weight: 600; color: var(--clr-text-primary);
+    }
+
+    .topbar-title span:last-child {
+      font-size: 11px; color: var(--clr-text-secondary);
+    }
+
+    /* Ruta de navegación (breadcrumb) */
+    #breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-sm);
+      font-size: 12px;
+      color: var(--clr-text-secondary);
+    }
+
+    #breadcrumb .crumb { cursor: default; }
+    #breadcrumb .crumb.clickable {
+      color: var(--clr-accent);
+      cursor: pointer;
+      transition: color var(--anim-fast);
+    }
+    #breadcrumb .crumb.clickable:hover { color: #4a9bff; }
+    #breadcrumb .sep { color: var(--clr-text-muted); }
+
+    /* Botón de reset en topbar */
+    #btn-reset-top {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      background: transparent;
+      border: 1px solid var(--clr-border-accent);
+      border-radius: var(--r-sm);
+      color: var(--clr-text-secondary);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all var(--anim-fast);
+    }
+    #btn-reset-top:hover {
+      border-color: var(--clr-accent);
+      color: var(--clr-accent);
+      background: var(--clr-accent-glow);
+    }
+
+    /* ============================================================
+       LAYOUT PRINCIPAL — Mapa + Sidebar
+       ============================================================ */
+    #app-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Contenedor del mapa SVG ── */
+    #map-container {
+      flex: 1;
+      position: relative;
+      background: var(--clr-bg-panel-alt);
+      overflow: hidden;
+    }
+
+    /* El SVG se inyecta aquí y ocupa todo el espacio */
+    #map-container svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ── OVERLAY de carga / error ── */
+    #overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-md);
+      background: var(--clr-bg-panel-alt);
+      z-index: 5;
+      transition: opacity var(--anim-slow);
+    }
+
+    #overlay.hidden { opacity: 0; pointer-events: none; }
+
+    .overlay-spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--clr-border);
+      border-top-color: var(--clr-accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .overlay-msg { font-size: 13px; color: var(--clr-text-secondary); }
+
+    /* Panel de error — más vistoso */
+    #error-panel {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-md);
+      padding: var(--sp-xl);
+      background: var(--clr-bg-panel);
+      border: 1px solid var(--clr-danger);
+      border-radius: var(--r-lg);
+      max-width: 480px;
+      text-align: center;
+    }
+
+    #error-panel .err-icon { font-size: 40px; }
+    #error-panel .err-title { font-size: 16px; font-weight: 600; color: var(--clr-danger); }
+    #error-panel .err-body { font-size: 13px; color: var(--clr-text-secondary); line-height: 1.6; }
+    #error-panel code {
+      display: block;
+      margin-top: var(--sp-sm);
+      padding: var(--sp-sm) var(--sp-md);
+      background: #0a0c10;
+      border-radius: var(--r-sm);
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 11px;
+      color: #64c8ff;
+      text-align: left;
+    }
+
+    /* ── Hint flotante de instrucción ── */
+    #map-hint {
+      position: absolute;
+      bottom: var(--sp-lg);
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 16px;
+      background: rgba(13, 15, 20, 0.85);
+      border: 1px solid var(--clr-border-accent);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--clr-text-secondary);
+      pointer-events: none;
+      transition: opacity var(--anim-slow);
+      white-space: nowrap;
+    }
+    #map-hint.hidden { opacity: 0; }
+
+    /* ============================================================
+       SIDEBAR — Panel de información
+       ============================================================ */
+    #sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--clr-bg-sidebar);
+      border-left: 1px solid var(--clr-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Cabecera del sidebar */
+    .sidebar-header {
+      padding: var(--sp-md);
+      border-bottom: 1px solid var(--clr-border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-header-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--clr-text-muted);
+      margin-bottom: var(--sp-sm);
+    }
+
+    /* Estado "sin selección" */
+    #sidebar-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-md);
+      padding: var(--sp-xl);
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 56px; height: 56px;
+      background: var(--clr-bg-panel);
+      border: 1px dashed var(--clr-border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      color: var(--clr-text-muted);
+    }
+
+    #sidebar-empty p {
+      font-size: 12px;
+      color: var(--clr-text-muted);
+      line-height: 1.6;
+    }
+
+    /* Estado "nave seleccionada" */
+    #sidebar-content {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    #sidebar-content.active { display: flex; }
+
+    /* Scrollbar personalizada */
+    #sidebar-content::-webkit-scrollbar { width: 4px; }
+    #sidebar-content::-webkit-scrollbar-track { background: transparent; }
+    #sidebar-content::-webkit-scrollbar-thumb { background: var(--clr-border); border-radius: 2px; }
+
+    /* Badge de nave seleccionada */
+    .nave-header {
+      padding: var(--sp-md);
+      border-bottom: 1px solid var(--clr-border);
+    }
+
+    .nave-id-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-xs);
+      padding: 3px 10px;
+      background: var(--clr-accent-glow);
+      border: 1px solid var(--clr-accent);
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--clr-accent);
+      letter-spacing: 0.05em;
+      margin-bottom: var(--sp-sm);
+    }
+
+    .nave-nombre {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--clr-text-primary);
+      line-height: 1.2;
+    }
+
+    .nave-subtitulo {
+      font-size: 12px;
+      color: var(--clr-text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Sección genérica dentro del sidebar */
+    .sidebar-section {
+      padding: var(--sp-md);
+      border-bottom: 1px solid var(--clr-border);
+    }
+
+    .section-title {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--clr-text-muted);
+      margin-bottom: var(--sp-sm);
+    }
+
+    /* Tarjeta de estatus */
+    .status-card {
+      background: var(--clr-bg-panel);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--r-md);
+      padding: var(--sp-sm) var(--sp-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .status-label { font-size: 12px; color: var(--clr-text-secondary); }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .status-badge.as-built {
+      background: rgba(0, 200, 117, 0.12);
+      border: 1px solid rgba(0, 200, 117, 0.4);
+      color: var(--clr-success);
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Métricas rápidas */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-sm);
+    }
+
+    .metric-card {
+      background: var(--clr-bg-panel);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--r-md);
+      padding: var(--sp-sm) var(--sp-md);
+    }
+
+    .metric-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--clr-text-primary);
+    }
+
+    .metric-lbl {
+      font-size: 10px;
+      color: var(--clr-text-muted);
+      margin-top: 2px;
+    }
+
+    /* Lista de documentos */
+    .doc-list { display: flex; flex-direction: column; gap: var(--sp-xs); }
+
+    .doc-item {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-sm);
+      padding: 8px 10px;
+      background: var(--clr-bg-panel);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--r-md);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color var(--anim-fast), background var(--anim-fast);
+    }
+
+    .doc-item:hover {
+      border-color: var(--clr-border-accent);
+      background: rgba(58, 74, 122, 0.15);
+    }
+
+    .doc-icon {
+      width: 28px; height: 28px;
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .doc-icon.plano   { background: rgba(0, 110, 255, 0.12); color: #5b9bff; }
+    .doc-icon.pid     { background: rgba(255, 169, 77, 0.12); color: var(--clr-warning); }
+    .doc-icon.manual  { background: rgba(0, 200, 117, 0.12); color: var(--clr-success); }
+    .doc-icon.spec    { background: rgba(180, 100, 255, 0.12); color: #b46aff; }
+    .doc-icon.report  { background: rgba(255, 92, 92, 0.12); color: var(--clr-danger); }
+
+    .doc-info { flex: 1; min-width: 0; }
+    .doc-name { font-size: 12px; font-weight: 500; color: var(--clr-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc-meta { font-size: 10px; color: var(--clr-text-muted); margin-top: 1px; }
+
+    .doc-arrow { font-size: 10px; color: var(--clr-text-muted); flex-shrink: 0; }
+
+    /* Botón de acción en sidebar */
+    .sidebar-action-btn {
+      margin: var(--sp-md);
+      padding: 10px;
+      background: var(--clr-accent-glow);
+      border: 1px solid var(--clr-accent);
+      border-radius: var(--r-md);
+      color: var(--clr-accent);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      transition: background var(--anim-fast);
+    }
+    .sidebar-action-btn:hover { background: var(--clr-accent-hover); }
+
+    /* ============================================================
+       STATUS BAR — Pie de página con coordenadas del viewBox
+       ============================================================ */
+    #statusbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--sp-md);
+      height: 26px;
+      background: var(--clr-bg-sidebar);
+      border-top: 1px solid var(--clr-border);
+      font-size: 10px;
+      color: var(--clr-text-muted);
+      flex-shrink: 0;
+    }
+
+    #vb-display { font-family: 'Cascadia Code', monospace; color: var(--clr-text-muted); }
+  </style>
+</head>
+<body>
+
+  <!-- ========== TOPBAR ========== -->
+  <header id="topbar" role="banner">
+    <div class="topbar-brand">
+      <div class="topbar-logo" aria-label="Givaudan">G</div>
+      <div class="topbar-title">
+        <span>Givaudan de México · Planta Pedro Escobedo</span>
+        <span>Master Layout · PE-S10000-10000-GEN-LAY-0001</span>
+      </div>
+    </div>
+
+    <!-- Breadcrumb de navegación actualizado en tiempo real -->
+    <nav id="breadcrumb" aria-label="Navegación de layout">
+      <span class="crumb clickable" onclick="resetView()" title="Volver a vista completa">Planta</span>
+      <span class="sep">›</span>
+      <span class="crumb" id="bc-nave">—</span>
+    </nav>
+
+    <button id="btn-reset-top" onclick="resetView()" title="Restaurar vista global">
+      ↺ Vista global
+    </button>
+  </header>
+
+  <!-- ========== CUERPO PRINCIPAL ========== -->
+  <main id="app-body">
+
+    <!-- ─── Mapa ─── -->
+    <section id="map-container" role="main" aria-label="Mapa interactivo de planta">
+
+      <!-- Overlay de carga / error -->
+      <div id="overlay" role="status" aria-live="polite">
+        <div class="overlay-spinner" id="spinner"></div>
+        <p class="overlay-msg" id="overlay-msg">Cargando Layout.svg…</p>
+
+        <!-- Panel de error CORS / archivo no encontrado -->
+        <div id="error-panel" role="alert">
+          <div class="err-icon">⚠️</div>
+          <p class="err-title" id="err-title">Error al cargar el archivo</p>
+          <p class="err-body" id="err-body">
+            Si estás abriendo este archivo con el protocolo <strong>file://</strong>,
+            el navegador bloquea las peticiones <code>fetch()</code> por políticas CORS.<br><br>
+            Solución: sirve los archivos con un servidor local:
+          </p>
+          <code id="err-cmd"></code>
+        </div>
+      </div>
+
+      <!-- Hint de instrucción -->
+      <div id="map-hint" role="note">🖱 Haz clic sobre una nave para ampliarla</div>
+    </section>
+
+    <!-- ─── Sidebar ─── -->
+    <aside id="sidebar" aria-label="Panel de información de nave">
+      <div class="sidebar-header">
+        <div class="sidebar-header-label">Inspector de activos</div>
+      </div>
+
+      <!-- Estado vacío -->
+      <div id="sidebar-empty">
+        <div class="empty-icon">🏭</div>
+        <p>Selecciona una nave industrial<br>en el mapa para ver sus detalles.</p>
+      </div>
+
+      <!-- Contenido dinámico — se rellena por JS -->
+      <div id="sidebar-content" aria-live="polite">
+        <!-- La función renderSidebar() inyecta aquí -->
+      </div>
+    </aside>
+  </main>
+
+  <!-- ========== STATUS BAR ========== -->
+  <footer id="statusbar">
+    <span>SVG · Coordenadas viewBox:</span>
+    <span id="vb-display">—</span>
+    <span id="sb-selected">Ninguna nave seleccionada</span>
+  </footer>
+
+
+  <!-- ============================================================
+       SCRIPT PRINCIPAL
+       Toda la lógica está encapsulada en un IIFE para evitar
+       contaminación del scope global, EXCEPTO las funciones que
+       necesitan ser llamadas desde el HTML (resetView).
+       ============================================================ -->
+  <script>
+  // ─────────────────────────────────────────────────────────────────
+  // MÓDULO PRINCIPAL
+  // ─────────────────────────────────────────────────────────────────
+  (function () {
+    'use strict';
+
+    // ── Referencias DOM ──
+    const mapContainer = document.getElementById('map-container');
+    const overlay      = document.getElementById('overlay');
+    const spinner      = document.getElementById('spinner');
+    const overlayMsg   = document.getElementById('overlay-msg');
+    const errorPanel   = document.getElementById('error-panel');
+    const errTitle     = document.getElementById('err-title');
+    const errBody      = document.getElementById('err-body');
+    const errCmd       = document.getElementById('err-cmd');
+    const mapHint      = document.getElementById('map-hint');
+    const sidebarEmpty   = document.getElementById('sidebar-empty');
+    const sidebarContent = document.getElementById('sidebar-content');
+    const bcNave       = document.getElementById('bc-nave');
+    const vbDisplay    = document.getElementById('vb-display');
+    const sbSelected   = document.getElementById('sb-selected');
+
+    // ── Estado de la aplicación ──
+    let svgEl          = null;   // Referencia al elemento <svg> inyectado
+    let viewBoxOriginal = '';    // viewBox inicial del SVG (para reset)
+    let naveActual     = null;   // ID de la nave seleccionada actualmente
+    let animFrame      = null;   // requestAnimationFrame en curso (para cancelar)
+
+    // ── Configuración de animación del viewBox ──
+    const PADDING_PCT  = 0.15;  // 15% de padding al ampliar una nave
+    const ANIM_DURACION = 500;   // ms para la transición suave del viewBox
+
+    // ─────────────────────────────────────────────────────────────
+    // BASE DE DATOS DE NAVES
+    // Aquí se define el contenido del sidebar para cada nave.
+    // El ID debe coincidir EXACTAMENTE con el atributo `id` del
+    // objeto dentro de la capa "Naves" del SVG de Inkscape.
+    // ─────────────────────────────────────────────────────────────
+    const DATOS_NAVES = {
+      // Formato de ejemplo — agrega/modifica según tu SVG real:
+      'Nave_Logistica': {
+        nombre: 'Nave de Logística',
+        subtitulo: 'Área de recepción, almacén y despacho',
+        area_m2: '4,200',
+        equipos: 38,
+        docs: [
+          { tipo: 'plano',  nombre: 'PE-LAY-LOG-001 · Distribución general', rev: 'Rev. C · 2024-03' },
+          { tipo: 'plano',  nombre: 'PE-LAY-LOG-002 · Rutas de circulación', rev: 'Rev. A · 2023-11' },
+          { tipo: 'pid',    nombre: 'PE-PID-LOG-005 · Sistema contra incendio', rev: 'Rev. B · 2024-01' },
+          { tipo: 'manual', nombre: 'Manual de operación · Sistemas WMS', rev: 'V2.1 · 2024-05' },
+          { tipo: 'spec',   nombre: 'ETE-LOG-001 · Especificación de estantes', rev: 'Rev. A · 2023-09' },
+        ]
+      },
+      'Nave_Produccion': {
+        nombre: 'Nave de Producción',
+        subtitulo: 'Proceso de manufactura principal',
+        area_m2: '6,800',
+        equipos: 124,
+        docs: [
+          { tipo: 'plano',  nombre: 'PE-LAY-PRO-001 · Layout de equipos', rev: 'Rev. D · 2024-06' },
+          { tipo: 'pid',    nombre: 'PE-PID-PRO-010 · Línea de mezcla #1', rev: 'Rev. C · 2024-04' },
+          { tipo: 'pid',    nombre: 'PE-PID-PRO-011 · Línea de mezcla #2', rev: 'Rev. B · 2024-02' },
+          { tipo: 'manual', nombre: 'Manual de equipos · Mezcladores Lodige', rev: 'V3.0 · 2023-12' },
+          { tipo: 'report', nombre: 'FAT Report · Reactor R-201', rev: '2024-01-15' },
+          { tipo: 'spec',   nombre: 'ETE-PRO-002 · Materiales en contacto', rev: 'Rev. B · 2023-10' },
+        ]
+      },
+      'Nave_Servicios': {
+        nombre: 'Nave de Servicios Generales',
+        subtitulo: 'Utilidades y servicios auxiliares',
+        area_m2: '1,950',
+        equipos: 67,
+        docs: [
+          { tipo: 'plano',  nombre: 'PE-LAY-SRV-001 · Cuarto de calderas', rev: 'Rev. B · 2024-05' },
+          { tipo: 'pid',    nombre: 'PE-PID-SRV-001 · Sistema de vapor', rev: 'Rev. C · 2024-03' },
+          { tipo: 'pid',    nombre: 'PE-PID-SRV-002 · Agua helada (CHW)', rev: 'Rev. A · 2023-08' },
+          { tipo: 'manual', nombre: 'Manual · Caldera Cleaver Brooks CB-300', rev: 'V1.2 · 2022-06' },
+          { tipo: 'spec',   nombre: 'ETE-SRV-001 · Tratamiento de agua', rev: 'Rev. A · 2024-01' },
+        ]
+      },
+      'Nave_QA': {
+        nombre: 'Laboratorio de Calidad',
+        subtitulo: 'Control de calidad y aseguramiento QA',
+        area_m2: '980',
+        equipos: 42,
+        docs: [
+          { tipo: 'plano',  nombre: 'PE-LAY-QA-001 · Layout de laboratorio', rev: 'Rev. A · 2023-07' },
+          { tipo: 'manual', nombre: 'Procedimiento · Muestreo de línea', rev: 'SOP-QA-005 · Rev. 3' },
+          { tipo: 'spec',   nombre: 'ETE-QA-001 · Clasificación de salas', rev: 'Rev. B · 2024-02' },
+        ]
+      },
+      'Nave_Oficinas': {
+        nombre: 'Edificio Administrativo',
+        subtitulo: 'Oficinas, sala de juntas y comedor',
+        area_m2: '1,200',
+        equipos: 12,
+        docs: [
+          { tipo: 'plano',  nombre: 'PE-LAY-ADM-001 · Planta arquitectónica', rev: 'Rev. A · 2022-11' },
+          { tipo: 'manual', nombre: 'Manual de emergencias · Edificio ADM', rev: 'V1.0 · 2023-03' },
+        ]
+      },
+      'Nave_Almacen': {
+        nombre: 'Almacén de Materias Primas',
+        subtitulo: 'Almacenamiento de ingredientes y químicos',
+        area_m2: '3,100',
+        equipos: 29,
+        docs: [
+          { tipo: 'plano',  nombre: 'PE-LAY-ALM-001 · Distribución de racks', rev: 'Rev. C · 2024-04' },
+          { tipo: 'pid',    nombre: 'PE-PID-ALM-001 · Sistema de extracción', rev: 'Rev. B · 2024-01' },
+          { tipo: 'report', nombre: 'Estudio HAZMAT · Materiales clase A', rev: '2023-09-20' },
+          { tipo: 'spec',   nombre: 'ETE-ALM-001 · Clasificación ATEX zona 1', rev: 'Rev. A · 2023-06' },
+        ]
+      },
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // ICONOS de tipo de documento (SVG inline mínimo)
+    // ─────────────────────────────────────────────────────────────
+    const DOC_ICONS = {
+      plano:  '📐',
+      pid:    '🔧',
+      manual: '📘',
+      spec:   '📋',
+      report: '📊',
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // CARGA DEL ARCHIVO SVG — fetch() con manejo de errores CORS
+    //
+    // Por qué fetch() y no <img src="Layout.svg">:
+    //   • Con fetch obtenemos el DOM interno del SVG (acceso a capas).
+    //   • Un <img> o <object> renderiza el SVG como imagen opaca:
+    //     no podemos manipular sus elementos internos con JS.
+    //
+    // El bloque catch distingue entre:
+    //   a) Error CORS (protocolo file://) — guía al usuario
+    //   b) Archivo no encontrado (404) — mensaje de ruta
+    //   c) Error inesperado — mensaje genérico
+    // ─────────────────────────────────────────────────────────────
+    async function cargarSVG() {
+      try {
+        const resp = await fetch('Layout.svg');
+
+        if (!resp.ok) {
+          // HTTP 404 u otro error de red
+          throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        }
+
+        const svgText = await resp.text();
+
+        // Parsear el texto SVG a DOM
+        const parser = new DOMParser();
+        const doc    = parser.parseFromString(svgText, 'image/svg+xml');
+        const errNode = doc.querySelector('parsererror');
+
+        if (errNode) {
+          throw new Error('El archivo SVG tiene errores de sintaxis: ' + errNode.textContent);
+        }
+
+        // Extraer el elemento <svg> y adjuntarlo al contenedor
+        svgEl = doc.documentElement;
+        mapContainer.insertBefore(svgEl, overlay);
+
+        inicializarSVG();
+        ocultarOverlay();
+
+      } catch (err) {
+        mostrarError(err);
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // INICIALIZACIÓN DEL SVG
+    //
+    // Esta función se llama una sola vez, después de que el SVG
+    // ha sido adjuntado al DOM y es medible (getBBox disponible).
+    // ─────────────────────────────────────────────────────────────
+    function inicializarSVG() {
+      // 1. Guardar el viewBox original para poder resetear después
+      viewBoxOriginal = svgEl.getAttribute('viewBox') || calcularViewBoxDesdeContenido();
+
+      // 2. Asegurar que el SVG sea responsivo pero con aspect-ratio preservado
+      svgEl.removeAttribute('width');
+      svgEl.removeAttribute('height');
+      svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+      // ── Estilos críticos aplicados al SVG ──────────────────────
+
+      // La capa Satelital NO debe interceptar eventos de mouse.
+      // Inkscape la exporta como un <g id="Satelital">.
+      // Sin pointer-events:none, los clics sobre el ráster de fondo
+      // nunca llegarían a los polígonos de las naves.
+      const capaSatelital = svgEl.querySelector('#Satelital, [inkscape\\:label="Satelital"]');
+      if (capaSatelital) {
+        capaSatelital.style.pointerEvents = 'none';
+      }
+
+      // 3. Registrar listeners en los objetos de la capa "Naves"
+      configurarInteraccionNaves();
+
+      // 4. Ocultar todas las capas de detalle al inicio
+      // (solo se mostrará la capa correspondiente a la nave clicada)
+      ocultarTodasLasCapasDetalle();
+
+      actualizarStatusBar();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // CONFIGURAR INTERACCIÓN EN LA CAPA "NAVES"
+    //
+    // Inkscape puede exportar la capa de dos maneras:
+    //   a) <g id="Naves">  ← más común con export básico
+    //   b) <g inkscape:label="Naves">  ← con metadatos Inkscape
+    //
+    // Buscamos ambas formas. Luego iteramos los hijos directos
+    // (rectángulos, polígonos, paths) y les añadimos:
+    //   · Estilo hover
+    //   · Event listener click
+    // ─────────────────────────────────────────────────────────────
+    function configurarInteraccionNaves() {
+      // Selección múltiple: intenta por id o por inkscape:label
+      const capaNaves =
+        svgEl.querySelector('#Naves') ||
+        svgEl.querySelector('[inkscape\\:label="Naves"]') ||
+        svgEl.querySelector('g[id*="nave" i]') ||  // fallback: g cuyo id contiene "nave" (insensible)
+        svgEl.querySelector('g[id*="Nave" i]');
+
+      if (!capaNaves) {
+        console.warn('[Layout] No se encontró la capa "Naves". Verifica el id en Inkscape.');
+        return;
+      }
+
+      // Iterar todos los hijos directos de la capa Naves
+      // (usamos children en lugar de querySelectorAll para evitar
+      //  seleccionar elementos anidados más profundos)
+      Array.from(capaNaves.children).forEach(el => {
+        // Solo elementos gráficos con id válido
+        if (!el.id || el.tagName === 'title' || el.tagName === 'desc') return;
+
+        // Guardar el fill original para poder restaurarlo al quitar hover
+        const fillOriginal = el.getAttribute('fill') || el.style.fill || 'transparent';
+        el.dataset.fillOriginal = fillOriginal;
+
+        // ── Estilos base del elemento nave ──
+        el.style.cursor = 'pointer';
+        el.style.transition = 'fill 150ms ease';
+
+        // ── Hover: resaltar con azul semitransparente ──
+        el.addEventListener('mouseenter', () => {
+          if (el.id !== naveActual) {
+            el.style.fill = 'rgba(0, 110, 255, 0.2)';
+          }
+        });
+
+        el.addEventListener('mouseleave', () => {
+          if (el.id !== naveActual) {
+            el.style.fill = el.dataset.fillOriginal;
+          }
+        });
+
+        // ── Click: navegar a la nave ──
+        el.addEventListener('click', () => seleccionarNave(el));
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // SELECCIONAR NAVE
+    //
+    // Es el corazón de la navegación. Al hacer clic:
+    //  1. Calcula el BBox del elemento para saber su posición exacta
+    //  2. Calcula el nuevo viewBox con padding
+    //  3. Anima la transición del viewBox
+    //  4. Actualiza las capas de detalle
+    //  5. Renderiza el sidebar
+    // ─────────────────────────────────────────────────────────────
+    function seleccionarNave(el) {
+      const naveId = el.id;
+
+      if (naveActual === naveId) {
+        // Clic en la misma nave → deseleccionar (comportamiento toggle)
+        // Comentar esta sección si se prefiere que no toggle
+        // resetView(); return;
+      }
+
+      // Marcar nave anterior como no-seleccionada
+      if (naveActual) {
+        const prevEl = svgEl.getElementById(naveActual);
+        if (prevEl) prevEl.style.fill = prevEl.dataset.fillOriginal || '';
+      }
+
+      naveActual = naveId;
+
+      // Mantener fill activo en la nave seleccionada
+      el.style.fill = 'rgba(0, 110, 255, 0.28)';
+
+      // ── 1. Obtener BoundingBox del elemento ──────────────────
+      // getBBox() devuelve las coordenadas en el sistema de
+      // coordenadas del propio SVG (no las coordenadas de pantalla).
+      // Esto es fundamental: usamos las coordenadas SVG, no los px
+      // del layout del navegador.
+      let bbox;
+      try {
+        bbox = el.getBBox();
+      } catch (e) {
+        console.warn('[Layout] No se pudo obtener getBBox de:', naveId, e);
+        return;
+      }
+
+      // ── 2. Calcular nuevo viewBox con padding ────────────────
+      // El padding se aplica como porcentaje de las dimensiones
+      // de la caja, así el zoom siempre deja un margen visual
+      // independientemente del tamaño de la nave.
+      const padX  = bbox.width  * PADDING_PCT;
+      const padY  = bbox.height * PADDING_PCT;
+      const nuevoVB = {
+        x: bbox.x - padX,
+        y: bbox.y - padY,
+        w: bbox.width  + padX * 2,
+        h: bbox.height + padY * 2,
+      };
+
+      // ── 3. Animar viewBox (Point & Zoom suave) ───────────────
+      animarViewBox(nuevoVB);
+
+      // ── 4. Mostrar capa de detalle correspondiente ───────────
+      // La lógica: en Inkscape, la capa de detalle de "Nave_Logistica"
+      // debe llamarse exactamente "Nave_Logistica" (mismo ID).
+      // Aquí ocultamos todas y mostramos solo la correcta.
+      sincronizarCapasDetalle(naveId);
+
+      // ── 5. Actualizar UI ─────────────────────────────────────
+      renderSidebar(naveId);
+      actualizarBreadcrumb(naveId);
+      mapHint.classList.add('hidden');
+      sbSelected.textContent = `Nave: ${naveId}`;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ANIMACIÓN DEL VIEWBOX
+    //
+    // En lugar de usar CSS transitions (que no funcionan en el
+    // atributo viewBox), usamos requestAnimationFrame con una
+    // función de interpolación lineal (lerp).
+    //
+    // Parámetros del viewBox: "x y width height"
+    //   x, y  → esquina superior izquierda del área visible
+    //   w, h  → ancho y alto del área visible
+    //
+    // Reducir w/h hace zoom-in (vemos menos área → más grande).
+    // Mover x,y centra el viewport sobre la zona deseada.
+    // ─────────────────────────────────────────────────────────────
+    function animarViewBox(objetivo) {
+      // Cancelar animación anterior si existe
+      if (animFrame) cancelAnimationFrame(animFrame);
+
+      // Parsear viewBox actual
+      const vbActual = parsearViewBox(svgEl.getAttribute('viewBox'));
+      const inicio   = performance.now();
+
+      function step(ahora) {
+        const t = Math.min((ahora - inicio) / ANIM_DURACION, 1);
+        // Easing: ease-in-out cúbico
+        const ease = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+
+        // Interpolación lineal de cada componente del viewBox
+        const vb = {
+          x: lerp(vbActual.x, objetivo.x, ease),
+          y: lerp(vbActual.y, objetivo.y, ease),
+          w: lerp(vbActual.w, objetivo.w, ease),
+          h: lerp(vbActual.h, objetivo.h, ease),
+        };
+
+        // Aplicar viewBox interpolado
+        const vbStr = `${vb.x} ${vb.y} ${vb.w} ${vb.h}`;
+        svgEl.setAttribute('viewBox', vbStr);
+        actualizarStatusBar(vbStr);
+
+        if (t < 1) {
+          animFrame = requestAnimationFrame(step);
+        } else {
+          animFrame = null;
+        }
+      }
+
+      animFrame = requestAnimationFrame(step);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // GESTIÓN DE CAPAS DE DETALLE DE INKSCAPE
+    //
+    // En Inkscape, el documento SVG tiene esta estructura:
+    //
+    //   <g id="Satelital">        ← capa de fondo
+    //   <g id="Naves">            ← capa de polígonos clickeables
+    //   <g id="Nave_Logistica">   ← capa de detalle (equipos)
+    //   <g id="Nave_Produccion">  ← capa de detalle
+    //   ...
+    //
+    // Inkscape agrega el atributo inkscape:groupmode="layer" a
+    // cada capa. Podemos identificarlas con ese atributo O por
+    // su posición en la jerarquía (hijos directos del <svg>).
+    //
+    // Estrategia:
+    //  1. Al inicio: ocultar (display:none) todas las capas de
+    //     detalle (todo excepto Satelital y Naves).
+    //  2. Al seleccionar nave X: mostrar solo la capa con id=X.
+    // ─────────────────────────────────────────────────────────────
+    function obtenerCapasDetalle() {
+      // Capas conocidas que NO son de detalle
+      const CAPAS_SISTEMA = new Set(['Satelital', 'Naves']);
+
+      return Array.from(svgEl.querySelectorAll(':scope > g, :scope > svg > g'))
+        .filter(g => {
+          const id    = g.id;
+          const label = g.getAttribute('inkscape:label') || '';
+          // Es capa de detalle si NO está en las capas de sistema
+          return id && !CAPAS_SISTEMA.has(id) && !CAPAS_SISTEMA.has(label);
+        });
+    }
+
+    function ocultarTodasLasCapasDetalle() {
+      obtenerCapasDetalle().forEach(g => {
+        g.style.display = 'none';
+      });
+    }
+
+    function sincronizarCapasDetalle(idNaveActiva) {
+      obtenerCapasDetalle().forEach(g => {
+        const coincide = g.id === idNaveActiva ||
+                         g.getAttribute('inkscape:label') === idNaveActiva;
+        g.style.display = coincide ? '' : 'none';
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RENDER DEL SIDEBAR
+    //
+    // Inyecta el HTML dinámico según la nave seleccionada.
+    // Si la nave no tiene datos registrados en DATOS_NAVES,
+    // muestra un panel genérico con el ID de la nave.
+    // ─────────────────────────────────────────────────────────────
+    function renderSidebar(naveId) {
+      sidebarEmpty.style.display = 'none';
+      sidebarContent.classList.add('active');
+
+      const datos = DATOS_NAVES[naveId] || {
+        nombre: formatearNombreId(naveId),
+        subtitulo: 'Nave industrial',
+        area_m2: '—',
+        equipos: '—',
+        docs: []
+      };
+
+      // Construir HTML de documentos
+      const docsHTML = datos.docs.length > 0
+        ? datos.docs.map(d => `
+          <div class="doc-item" role="listitem" tabindex="0"
+               aria-label="${d.nombre}"
+               onkeydown="if(event.key==='Enter')this.click()">
+            <div class="doc-icon ${d.tipo}" aria-hidden="true">${DOC_ICONS[d.tipo] || '📄'}</div>
+            <div class="doc-info">
+              <div class="doc-name">${d.nombre}</div>
+              <div class="doc-meta">${d.rev}</div>
+            </div>
+            <span class="doc-arrow">↗</span>
+          </div>`).join('')
+        : '<p style="font-size:12px;color:var(--clr-text-muted)">No hay documentos registrados.</p>';
+
+      sidebarContent.innerHTML = `
+        <!-- Cabecera de nave -->
+        <div class="nave-header">
+          <div class="nave-id-tag">● ${naveId}</div>
+          <div class="nave-nombre">${datos.nombre}</div>
+          <div class="nave-subtitulo">${datos.subtitulo}</div>
+        </div>
+
+        <!-- Estatus -->
+        <div class="sidebar-section">
+          <div class="section-title">Estado del documento</div>
+          <div class="status-card">
+            <span class="status-label">Revisión</span>
+            <span class="status-badge as-built">
+              <span class="status-dot"></span>
+              AS BUILT
+            </span>
+          </div>
+        </div>
+
+        <!-- Métricas -->
+        <div class="sidebar-section">
+          <div class="section-title">Datos generales</div>
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-val">${datos.area_m2}</div>
+              <div class="metric-lbl">Área m²</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val">${datos.equipos}</div>
+              <div class="metric-lbl">Equipos registrados</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documentos -->
+        <div class="sidebar-section">
+          <div class="section-title">Documentación técnica</div>
+          <div class="doc-list" role="list">
+            ${docsHTML}
+          </div>
+        </div>
+
+        <!-- Botón de acción -->
+        <button class="sidebar-action-btn" onclick="resetView()">
+          ↺ Volver a vista global
+        </button>
+      `;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // FUNCIONES UTILITARIAS
+    // ─────────────────────────────────────────────────────────────
+
+    // Parsear un string viewBox "x y w h" a un objeto
+    function parsearViewBox(vbStr) {
+      if (!vbStr) return { x: 0, y: 0, w: 100, h: 100 };
+      const [x, y, w, h] = vbStr.trim().split(/[\s,]+/).map(Number);
+      return { x, y, w, h };
+    }
+
+    // Interpolar linealmente entre a y b con factor t ∈ [0,1]
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    // Calcular viewBox desde el contenido del SVG si no tiene uno
+    function calcularViewBoxDesdeContenido() {
+      try {
+        const bb = svgEl.getBBox();
+        return `${bb.x} ${bb.y} ${bb.width} ${bb.height}`;
+      } catch {
+        return '0 0 1000 700';
+      }
+    }
+
+    // Convertir un ID tipo "Nave_Logistica" a "Nave Logística"
+    function formatearNombreId(id) {
+      return id.replace(/_/g, ' ');
+    }
+
+    // Actualizar el breadcrumb de navegación
+    function actualizarBreadcrumb(naveId) {
+      bcNave.textContent = formatearNombreId(naveId);
+    }
+
+    // Actualizar la barra de estado con el viewBox actual
+    function actualizarStatusBar(vbStr) {
+      const vb = parsearViewBox(vbStr || svgEl?.getAttribute('viewBox') || '');
+      vbDisplay.textContent =
+        `x:${Math.round(vb.x)} y:${Math.round(vb.y)} w:${Math.round(vb.w)} h:${Math.round(vb.h)}`;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // MANEJO DE ERRORES — mostrar panel con guía para el usuario
+    // ─────────────────────────────────────────────────────────────
+    function mostrarError(err) {
+      spinner.style.display = 'none';
+      overlayMsg.style.display = 'none';
+      errorPanel.style.display = 'flex';
+
+      const esCORS = err.message.toLowerCase().includes('cors') ||
+                     err.message.toLowerCase().includes('failed to fetch') ||
+                     location.protocol === 'file:';
+
+      if (esCORS) {
+        errTitle.textContent = 'Error de política CORS (file://)';
+        errBody.innerHTML = `
+          Estás abriendo este archivo directamente con el protocolo
+          <strong style="color:var(--clr-warning)">file://</strong>, lo cual bloquea las
+          peticiones <code style="background:transparent;padding:0;color:inherit">fetch()</code>
+          hacia otros archivos locales.<br><br>
+          Sirve los archivos con un servidor HTTP local:
+        `;
+        errCmd.textContent =
+          `# Python (recomendado)\n` +
+          `cd /ruta/a/tus/archivos\n` +
+          `python -m http.server 8080\n\n` +
+          `# Node.js\n` +
+          `npx serve .\n\n` +
+          `# Luego abre: http://localhost:8080/givaudan_layout.html`;
+      } else {
+        errTitle.textContent = 'No se pudo cargar Layout.svg';
+        errBody.innerHTML = `
+          Asegúrate de que el archivo <strong>Layout.svg</strong> esté en la
+          <strong>misma carpeta</strong> que este HTML y que el nombre sea exactamente
+          <code style="background:transparent;padding:0;color:inherit">Layout.svg</code>
+          (sensible a mayúsculas).<br><br>
+          Error técnico:
+        `;
+        errCmd.textContent = err.message;
+      }
+    }
+
+    // Ocultar el overlay con fade
+    function ocultarOverlay() {
+      overlay.classList.add('hidden');
+      setTimeout(() => { overlay.style.display = 'none'; }, 450);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RESET VIEW — función pública (llamada desde HTML)
+    //
+    // Se expone en window para ser accesible desde atributos
+    // onclick del HTML sin errores de scope.
+    // ─────────────────────────────────────────────────────────────
+    window.resetView = function () {
+      if (!svgEl) return;
+
+      // Restaurar fill de la nave seleccionada
+      if (naveActual) {
+        const prevEl = svgEl.getElementById(naveActual);
+        if (prevEl) prevEl.style.fill = prevEl.dataset.fillOriginal || '';
+        naveActual = null;
+      }
+
+      // Animar de regreso al viewBox original
+      animarViewBox(parsearViewBox(viewBoxOriginal));
+
+      // Ocultar todas las capas de detalle
+      ocultarTodasLasCapasDetalle();
+
+      // Resetear sidebar
+      sidebarContent.classList.remove('active');
+      sidebarContent.innerHTML = '';
+      sidebarEmpty.style.display = '';
+
+      // Resetear breadcrumb
+      bcNave.textContent = '—';
+      mapHint.classList.remove('hidden');
+      sbSelected.textContent = 'Ninguna nave seleccionada';
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // INICIO
+    // ─────────────────────────────────────────────────────────────
+    cargarSVG();
+
+  })(); // fin IIFE
+  </script>
+
+</body>
+</html>
